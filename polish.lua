@@ -1,45 +1,36 @@
---/__________\
---  10 20 -     -> 10 - 20
---   5 2 *      ->  5 * 2
---  15 10 + 2 - ->  23
---   1 1 + 2 /  ->
---  ...
---_____________
+local s = [[
+  /__________\
+    10 20 -
+    5 2 *
+    15 10 + 2 -
+    1 1 + 2 /
+  _____________
+]]
 
-
--- lluis.esquerda@konghq.com
-
---"10 20 -" --> -10
-
---pop()
---push()
 local operators = {
-  ["+"] = function(x, y) return x + y end
+  ["+"] = function(x, y) return x + y end,
+  ["-"] = function(x, y) return x - y end,
+  ["*"] = function(x, y) return x * y end,
+  ["/"] = function(x, y) return x / y end,
 }
 
 local function parse(s)
-  -- "10 20 - "
-  result = s.split(' ')
-  stack = {}
+  local stack = {}
 
-  for last in result do
-    if last == '+'
-      -- {10, 20}
-      first = stack.pop()
-      -- {10}
-      second = stack.pop()
-      local f = stack.insert(operators[last])
-      print(f(first, second))
-      -- {25}
-    elseif last == '-'
-      -- {10, 20}
-      first = stack.pop()
-      -- {10}
-      second = stack.pop()
-      stack.insert(first - second)
-      -- {25}
-    else
-      stack.insert(elem)
+  for w in s:gmatch("%S+") do
+    local operator = operators[w]
+    if operator then
+      first = table.remove(stack)
+      second = table.remove(stack)
+      table.insert(stack, operator(second, first))
+    elseif tonumber(w) then
+      table.insert(stack, w)
     end
   end
 
+  for _, v in ipairs(stack) do
+    print(v)
+  end
+end
+
+parse(s)
